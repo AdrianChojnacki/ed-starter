@@ -1,0 +1,10 @@
+---
+description: TypeScript conventions and Next.js App Router patterns
+globs: src/**/*.ts, app/**/*.ts
+alwaysApply: false
+---
+
+Use ES modules syntax, path aliases with @/.
+API routes use NextResponse.json().
+Types live in types/index.ts - import from @/types.
+All state through Zustand store in store/flightsStore.ts.
