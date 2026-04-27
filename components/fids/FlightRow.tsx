@@ -33,7 +33,7 @@ export function FlightRow({ flight, index }: FlightRowProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-[120px_160px_1fr_80px_60px_60px_140px] items-center gap-2 px-4 py-3 text-sm font-mono border-b border-board-border transition-colors',
+        'grid grid-cols-[120px_160px_1fr_80px_60px_60px_140px_32px] items-center gap-2 px-4 py-3 text-sm font-mono border-b border-board-border transition-colors',
         index % 2 === 0 ? 'bg-board-row' : 'bg-board-row-alt',
         isCancelled && 'opacity-50',
         isDeparted && 'opacity-60'
@@ -57,6 +57,12 @@ export function FlightRow({ flight, index }: FlightRowProps) {
         <StatusBadge status={flight.status} />
         {flight.status === 'Delayed' && flight.delayMinutes && (
           <span className="ml-1 text-orange-400 text-xs">+{flight.delayMinutes}m</span>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center">
+        {(flight.status === 'Delayed' || flight.status === 'Cancelled') && (
+          <span className="w-3 h-3 bg-red-600 rounded-sm inline-block" />
         )}
       </div>
     </div>

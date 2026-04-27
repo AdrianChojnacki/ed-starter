@@ -5,6 +5,7 @@ import { FlightRow } from './FlightRow';
 import { LiveClock } from './LiveClock';
 import { useShallow } from 'zustand/react/shallow';
 import { useFlightsStore, selectFilteredFlights } from '@/store/flightsStore';
+import type { SortField } from '@/store/flightsStore';
 import type { Flight, FlightStatus, Terminal } from '@/types';
 import { ALL_AIRLINES, ALL_STATUSES, ALL_TERMINALS } from '@/types';
 
@@ -13,8 +14,22 @@ interface FlightBoardProps {
 }
 
 export function FlightBoard({ initialFlights }: FlightBoardProps) {
-  const { filters, setFilter, setFlights } = useFlightsStore();
+  const { filters, setFilter, setFlights, sort, setSort } = useFlightsStore();
   const flights = useFlightsStore(useShallow(selectFilteredFlights));
+
+  const SortButton = ({ field, label, center }: { field: SortField; label: string; center?: boolean }) => {
+    const active = sort.field === field;
+    const indicator = active ? (sort.direction === 'asc' ? ' ↑' : ' ↓') : ' ⇅';
+    return (
+      <button
+        onClick={() => setSort(field)}
+        className={`flex items-center gap-0.5 uppercase tracking-widest text-xs cursor-pointer hover:text-amber-400 transition-colors ${center ? 'justify-center w-full' : ''} ${active ? 'text-amber-400' : 'text-board-muted'}`}
+      >
+        {label}
+        <span className={active ? 'text-amber-400' : 'text-board-muted opacity-50'}>{indicator}</span>
+      </button>
+    );
+  };
 
   useEffect(() => {
     setFlights(initialFlights);
@@ -92,14 +107,15 @@ export function FlightBoard({ initialFlights }: FlightBoardProps) {
       </div>
 
       {/* Column headers */}
-      <div className="grid grid-cols-[120px_160px_1fr_80px_60px_60px_140px] gap-2 px-4 py-2 text-xs text-board-muted uppercase tracking-widest border-b border-board-border bg-board-header">
+      <div className="grid grid-cols-[120px_160px_1fr_80px_60px_60px_140px_32px] gap-2 px-4 py-2 text-xs text-board-muted uppercase tracking-widest border-b border-board-border bg-board-header">
         <span>Flight</span>
         <span>Airline</span>
         <span>Destination</span>
-        <span className="text-center">Time</span>
-        <span className="text-center">Term.</span>
+        <span className="flex justify-center"><SortButton field="departureTime" label="Time" center /></span>
+        <span className="flex justify-center"><SortButton field="terminal" label="Term." center /></span>
         <span className="text-center">Gate</span>
-        <span>Status</span>
+        <SortButton field="status" label="Status" />
+        <span aria-hidden />
       </div>
 
       {/* Flights */}

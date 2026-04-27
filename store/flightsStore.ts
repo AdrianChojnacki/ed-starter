@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import type { Flight, FlightStatus, Terminal } from '@/types';
 
+export type SortField = 'departureTime' | 'status' | 'terminal';
+export type SortDirection = 'asc' | 'desc';
+
+interface SortState {
+  field: SortField | null;
+  direction: SortDirection;
+}
+
 interface FiltersState {
   terminal: Terminal | 'All';
   airline: string;
@@ -11,8 +19,10 @@ interface FiltersState {
 interface FlightsStore {
   flights: Flight[];
   filters: FiltersState;
+  sort: SortState;
   setFlights: (flights: Flight[]) => void;
   setFilter: <K extends keyof FiltersState>(key: K, value: FiltersState[K]) => void;
+  setSort: (field: SortField) => void;
   updateFlight: (id: string, updates: Partial<Flight>) => void;
   addFlight: (flight: Flight) => void;
   removeFlight: (id: string) => void;
@@ -27,12 +37,24 @@ export const useFlightsStore = create<FlightsStore>((set) => ({
     status: 'All',
     destination: '',
   },
+  sort: {
+    field: null,
+    direction: 'asc',
+  },
 
   setFlights: (flights) => set({ flights }),
 
   setFilter: (key, value) =>
     set((state) => ({
       filters: { ...state.filters, [key]: value },
+    })),
+
+  setSort: (field) =>
+    set((state) => ({
+      sort: {
+        field,
+        direction: state.sort.field === field && state.sort.direction === 'asc' ? 'desc' : 'asc',
+      },
     })),
 
   updateFlight: (id, updates) =>
@@ -48,13 +70,39 @@ export const useFlightsStore = create<FlightsStore>((set) => ({
   resetFlights: (flights) => set({ flights }),
 }));
 
+const STATUS_PRIORITY: Record<FlightStatus, number> = {
+  Boarding: 1,
+  'On Time': 2,
+  Delayed: 3,
+  Departed: 4,
+  Cancelled: 5,
+};
+
 export function selectFilteredFlights(state: FlightsStore): Flight[] {
-  const { flights, filters } = state;
-  return flights.filter((f) => {
+  const { flights, filters, sort } = state;
+
+  const filtered = flights.filter((f) => {
     if (filters.terminal !== 'All' && f.terminal !== filters.terminal) return false;
     if (filters.airline !== 'All' && f.airline !== filters.airline) return false;
     if (filters.status !== 'All' && f.status !== filters.status) return false;
     if (filters.destination !== '' && !f.destination.toLowerCase().includes(filters.destination.toLowerCase())) return false;
     return true;
+  });
+
+  if (!sort.field) return filtered;
+
+  const dir = sort.direction === 'asc' ? 1 : -1;
+
+  return [...filtered].sort((a, b) => {
+    switch (sort.field) {
+      case 'departureTime':
+        return a.departureTime.localeCompare(b.departureTime) * dir;
+      case 'terminal':
+        return a.terminal.localeCompare(b.terminal) * dir;
+      case 'status':
+        return (STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status]) * dir;
+      default:
+        return 0;
+    }
   });
 }
