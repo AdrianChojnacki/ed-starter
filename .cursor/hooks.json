@@ -11,6 +11,13 @@
         "command": ".cursor/hooks/typecheck-after-edit.sh",
         "matcher": "Write|Edit"
       }
+    ],
+    "stop": [
+      {
+        "type": "prompt",
+        "prompt": "From the project root, run `npm run test` (full test suite). If every test passes, respond with exactly: {\"ok\": true}. If any test fails, respond with exactly: {\"ok\": false, \"reason\": \"<concise summary of which tests failed and the error output>\"}. Base your answer only on the actual command result.",
+        "timeout": 120
+      }
     ]
   }
 }
