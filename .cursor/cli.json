@@ -1,5 +1,7 @@
 {
+  "version": 1,
   "permissions": {
-    "allow": ["Shell(npm:run*)"]
+    "allow": ["Shell(node *)", "Shell(npm *)", "Read(src/**)", "Write(src/**/*.ts)"],
+    "deny": ["Read(**/.env*)", "Write(**/.key)", "Shell(curl *)", "Shell(wget *)"]
   }
 }
