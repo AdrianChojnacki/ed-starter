@@ -4,7 +4,7 @@ import { ALL_STATUSES } from '@/types';
 import type { FlightStatus } from '@/types';
 
 export async function GET() {
-  const flights = readFlights();
+  const flights = await readFlights();
 
   const stats = ALL_STATUSES.reduce<Record<FlightStatus, number>>(
     (acc, status) => {

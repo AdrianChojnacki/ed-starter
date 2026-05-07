@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      target: dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  db:
+    ports:
+      - '5432:5432'
+    healthcheck:
+      interval: 5s

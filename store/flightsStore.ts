@@ -42,7 +42,7 @@ export const useFlightsStore = create<FlightsStore>((set) => ({
     direction: 'asc',
   },
 
-  setFlights: (flights) => set({ flights }),
+  setFlights: (flights) => set({ flights: Array.isArray(flights) ? flights : [] }),
 
   setFilter: (key, value) =>
     set((state) => ({
@@ -67,7 +67,7 @@ export const useFlightsStore = create<FlightsStore>((set) => ({
   removeFlight: (id) =>
     set((state) => ({ flights: state.flights.filter((f) => f.id !== id) })),
 
-  resetFlights: (flights) => set({ flights }),
+  resetFlights: (flights) => set({ flights: Array.isArray(flights) ? flights : [] }),
 }));
 
 const STATUS_PRIORITY: Record<FlightStatus, number> = {
@@ -81,7 +81,8 @@ const STATUS_PRIORITY: Record<FlightStatus, number> = {
 export function selectFilteredFlights(state: FlightsStore): Flight[] {
   const { flights, filters, sort } = state;
 
-  const filtered = flights.filter((f) => {
+  const safeFlights = Array.isArray(flights) ? flights : [];
+  const filtered = safeFlights.filter((f) => {
     if (filters.terminal !== 'All' && f.terminal !== filters.terminal) return false;
     if (filters.airline !== 'All' && f.airline !== filters.airline) return false;
     if (filters.status !== 'All' && f.status !== filters.status) return false;
