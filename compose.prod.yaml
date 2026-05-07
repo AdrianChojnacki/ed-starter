@@ -16,3 +16,9 @@ services:
         limits:
           cpus: '0.5'
           memory: 256M
+  cloudflared:
+    image: cloudflare/cloudflared:2026.3.0
+    command: ['tunnel', '--no-autoupdate', 'run', '--token', '${CLOUDFLARED_TOKEN}']
+    depends_on:
+      - app
+    restart: unless-stopped
