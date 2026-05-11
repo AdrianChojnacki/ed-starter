@@ -1,4 +1,4 @@
-FROM dhi.io/node:24-alpine3.23-dev AS deps
+FROM node:24-alpine AS deps
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN if [ -f package-lock.json ]; then \
     echo "No lockfile found." && exit 1; \
   fi
 
-FROM dhi.io/node:24-alpine3.23-dev AS dev
+FROM node:24-alpine AS dev
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY . .
 
 CMD ["npm", "run", "dev"]
 
-FROM dhi.io/node:24-alpine3.23-dev AS builder
+FROM node:24-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -39,7 +39,7 @@ RUN if [ -f package-lock.json ]; then \
     echo "No lockfile found." && exit 1; \
   fi
 
-FROM dhi.io/node:24-alpine3.23 AS runner
+FROM node:24-alpine AS runner
 
 # Set working directory
 WORKDIR /app
